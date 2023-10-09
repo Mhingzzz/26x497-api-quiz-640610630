@@ -4,21 +4,27 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 type EnrollmentWithRelation = Enrollment & {
-  student: Student;
-  course: Course;
+	student: Student;
+	course: Course;
 };
 
 export type EnrollmentGetResponse = {
-  enrollments: EnrollmentWithRelation[];
+	enrollments: EnrollmentWithRelation[];
 };
 
 export const GET = async () => {
-  const prisma = getPrisma();
+	const prisma = getPrisma();
 
-  // 3. display enrollment data (showing student data and course data)
-  // const enrollments = await prisma...
-
-  return NextResponse.json<EnrollmentGetResponse>({
-    enrollments: [], //replace empty array with result from DB
-  });
+	// 3. display enrollment data (showing student data and course data)
+	// const enrollments = await prisma...
+	const enrollments = await prisma.enrollment.findMany({
+		include: {
+			student: true,
+			course: true,
+		},
+		orderBy: { createdAt: "desc" },
+	});
+	return NextResponse.json<EnrollmentGetResponse>({
+		enrollments: enrollments,
+	});
 };
